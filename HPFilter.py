@@ -6,7 +6,7 @@ import pandas_datareader as pdr
 import numpy as np
 
 # set the start and end dates for the data
-start_date = '1955-01-01'
+start_date = '2000-01-01'
 end_date = '2022-01-01'
 
 # download the data from FRED using pandas_datareader
