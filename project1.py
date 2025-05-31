@@ -17,7 +17,7 @@ log_gdp_france = np.log(gdp_france)
 # apply a Hodrick-Prescott filter to the data to extract the cyclical component
 cycle_france_np, trend_france = sm.tsa.filters.hpfilter(log_gdp_france, lamb=1600)
 
-# IMPORTANT FIX: Convert NumPy array to pandas Series, preserving original index and naming the series
+# Convert NumPy array to pandas Series, preserving original index and naming the series
 cycle_france = pd.Series(cycle_france_np, index=log_gdp_france.index, name='France_Cycle')
 
 # Calculate the standard deviation of the cyclical component
@@ -38,7 +38,7 @@ log_gdp_japan = np.log(gdp_japan)
 # apply a Hodrick-Prescott filter to the data to extract the cyclical component
 cycle_japan_np, trend_japan = sm.tsa.filters.hpfilter(log_gdp_japan, lamb=1600)
 
-# IMPORTANT FIX: Convert NumPy array to pandas Series, preserving original index and naming the series
+# Convert NumPy array to pandas Series, preserving original index and naming the series
 cycle_japan = pd.Series(cycle_japan_np, index=log_gdp_japan.index, name='Japan_Cycle')
 
 
@@ -48,6 +48,7 @@ std_dev_cycle_japan = np.std(cycle_japan)
 print(f"日本の循環成分の標準偏差: {std_dev_cycle_japan:.4f}")
 
 # --- 3. フランスと日本の循環変動成分の相関係数を計算 ---
+
 print("\n# --- フランスと日本の循環変動成分の相関係数の計算 ---")
 
 # 両国の循環成分のSeriesをDataFrameに結合する
@@ -62,3 +63,17 @@ correlation_coefficient = aligned_cycles['France_Cycle'].corr(aligned_cycles['Ja
 
 print(f"フランスと日本の循環変動成分の相関係数: {correlation_coefficient:.4f}")
 print(f"相関係数計算に使用されたデータ期間: {aligned_cycles.index.min().strftime('%Y-%m-%d')} から {aligned_cycles.index.max().strftime('%Y-%m-%d')}")
+
+# --- 4. 循環変動成分の時系列グラフを作成 ---
+
+plt.figure(figsize=(12, 6)) # グラフのサイズを設定
+plt.plot(aligned_cycles.index, aligned_cycles['France_Cycle'], label='France Cyclical Component')
+plt.plot(aligned_cycles.index, aligned_cycles['Japan_Cycle'], label='Japan Cyclical Component')
+
+plt.title('Cyclical Components of France and Japan') # グラフのタイトル
+plt.xlabel('Date') 
+plt.ylabel('Cyclical Component') 
+plt.legend() # 凡例を表示
+plt.grid(True) # グリッドを表示
+plt.tight_layout() # レイアウトを調整
+plt.show() # グラフを表示
