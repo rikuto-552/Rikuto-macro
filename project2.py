@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-pwt90 = pd.read_stata('https://www.rug.nl/ggdc/docs/pwt90.dta')
+pwt1001 = pd.read_stata('https://dataverse.nl/api/access/datafile/354098')
 
 oecd_countries = [
         'Australia', 'Austria', 'Belgium', 'Canada', 'Denmark', 'Finland', 'France',
@@ -10,9 +10,9 @@ oecd_countries = [
         'United Kingdom', 'United States'
     ]
 
-data = pwt90[
-        pwt90['country'].isin(oecd_countries) &
-        pwt90['year'].between(1960, 2000)
+data = pwt1001[
+        pwt1001['country'].isin(oecd_countries) &
+        pwt1001['year'].between(1990, 2019)
     ]
 
 relevant_cols = ['countrycode', 'country', 'year', 'rgdpna', 'rkna', 'pop', 'emp', 'avh', 'labsh', 'rtfpna']
