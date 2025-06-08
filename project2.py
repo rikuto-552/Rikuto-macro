@@ -1,9 +1,7 @@
 import pandas as pd
 import numpy as np
 
-pwt90 = pd.read_stata('pwt90.dta')
-
-pwt90.head()
+pwt90 = pd.read_stata('https://www.rug.nl/ggdc/docs/pwt90.dta')
 
 oecd_countries = [
         'Australia', 'Austria', 'Belgium', 'Canada', 'Denmark', 'Finland', 'France',
@@ -40,17 +38,13 @@ def calculate_growth_rates_standard(country_data):
 
     years = end_data['year'] - start_data['year']
 
-    # 期間が1年しかない場合は成長率を計算できない（ゼロ除算を避けるための最低限の考慮）
-    if years == 0:
-        return None
-
-    # 1. 労働者一人当たり生産量 (Y/L) の成長率 (Growth Rate)
+    # 1. 労働者一人当たり生産量 (Y/L) の年平均成長率 (Growth Rate)
     g_y = ((end_data['y_n'] / start_data['y_n']) ** (1/years) - 1) * 100
 
-    # 2. TFP (A) の成長率 (TFP Growth)
+    # 2. TFP (A) の年平均成長率 (TFP Growth)
     g_a_true = ((end_data['rtfpna'] / start_data['rtfpna']) ** (1/years) - 1) * 100
 
-    # 3. 労働者一人当たり資本 (K/L) の成長率を計算
+    # 3. 労働者一人当たり資本 (K/L) の年平均成長率を計算
     start_kl = start_data['rkna'] / start_data['emp']
     end_kl = end_data['rkna'] / end_data['emp']
     g_kl_true = ((end_kl / start_kl) ** (1/years) - 1) * 100
@@ -60,14 +54,12 @@ def calculate_growth_rates_standard(country_data):
     end_alpha = 1 - end_data['labsh']
     alpha_avg = (start_alpha + end_alpha) / 2.0
 
-    # 5. 資本深化の貢献 (Capital Deepening)
+    # 5. 資本深化の成長への貢献度 (Capital Deepening)
     capital_deepening_contrib_true = alpha_avg * g_kl_true
 
     # TFP Share と Capital Share の計算
-    # 0除算の考慮はせず、そのまま計算（NaNになる可能性あり）
     tfp_share = (g_a_true / g_y)
     cap_share = (capital_deepening_contrib_true / g_y)
-
 
     # 結果を辞書形式で返す
     return {
@@ -79,11 +71,11 @@ def calculate_growth_rates_standard(country_data):
         'Capital Share': round(cap_share, 2)
     }
 
-# 各国ごとに成長率計算関数を適用
+
 results_list = data.groupby('country').apply(calculate_growth_rates_standard).dropna().tolist()
+
 results_df = pd.DataFrame(results_list)
 
-# 全OECD平均の計算
 avg_row_data = {
     'Country': 'Average',
     'Growth Rate': round(results_df['Growth Rate'].mean(), 2),
@@ -94,6 +86,7 @@ avg_row_data = {
 }
 results_df = pd.concat([results_df, pd.DataFrame([avg_row_data])], ignore_index=True)
 
+# 結果を整形して出力
 print("\nTable 5.1 Growth Accounting in OECD Countries: 1960-2000")
 print("="*85)
 print(results_df.to_string(index=False))
